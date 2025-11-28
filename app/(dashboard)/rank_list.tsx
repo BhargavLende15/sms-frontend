@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../../hooks/useTheme";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_URL || "http://localhost:9099";
@@ -126,3 +126,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+

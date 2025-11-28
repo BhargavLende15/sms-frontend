@@ -84,6 +84,10 @@ const StudentCourses = () => {
       alert("You must be logged in to enroll");
       return;
     }
+    if (user.type !== "student") {
+      alert("Only students can enroll in courses");
+      return;
+    }
     setEnrollLoadingId(courseId);
     try {
       await axios.post(`${API_BASE_URL}/courses/${courseId}/enroll`, {
@@ -94,6 +98,7 @@ const StudentCourses = () => {
     } catch (error: any) {
       const message = error.response?.data || "Failed to enroll";
       alert(message);
+      console.log("Enrollment error:", error.response?.data || error.message);
     } finally {
       setEnrollLoadingId(null);
     }
