@@ -120,43 +120,58 @@ const StudentCourses = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={containerStyle}>
-      <Text style={titleStyle}>Available Courses</Text>
+    <ScrollView contentContainerStyle={containerStyle} showsVerticalScrollIndicator={false}>
+      <Text style={[titleStyle, { color: theme.text }]}>Available Courses</Text>
       {loading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={theme.primary} style={styles.loader} />
       ) : courses.length === 0 ? (
-        <Text style={textStyle}>No courses available right now.</Text>
+        <View style={[styles.emptyState, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <Text style={[textStyle, { color: theme.textSecondary }]}>
+            No courses available right now.
+          </Text>
+        </View>
       ) : (
         courses.map((course) => {
           const isEnrolled = enrolledIds.has(course.id);
           return (
-            <View key={course.id} style={styles.courseCard}>
+            <View key={course.id} style={[styles.courseCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
               <Text style={[styles.courseTitle, { color: theme.text }]}>
                 {course.title}
               </Text>
-              <Text style={textStyle}>{course.department}</Text>
+              <Text style={[styles.department, { color: theme.textSecondary }]}>
+                {course.department}
+              </Text>
               {course.description ? (
-                <Text style={textStyle}>{course.description}</Text>
+                <Text style={[styles.description, { color: theme.text }]}>
+                  {course.description}
+                </Text>
               ) : null}
               {course.capacity ? (
-                <Text style={textStyle}>Capacity: {course.capacity}</Text>
+                <Text style={[styles.capacity, { color: theme.textSecondary }]}>
+                  Capacity: {course.capacity}
+                </Text>
               ) : null}
-              <Button
-                title={
-                  isEnrolled
-                    ? "Enrolled"
-                    : enrollLoadingId === course.id
-                    ? "Enrolling..."
-                    : "Enroll"
-                }
-                onPress={() => handleEnroll(course.id)}
-                disabled={isEnrolled || enrollLoadingId === course.id}
-              />
+              <View style={styles.buttonContainer}>
+                <Button
+                  title={
+                    isEnrolled
+                      ? "Enrolled"
+                      : enrollLoadingId === course.id
+                      ? "Enrolling..."
+                      : "Enroll"
+                  }
+                  onPress={() => handleEnroll(course.id)}
+                  disabled={isEnrolled || enrollLoadingId === course.id}
+                  color={isEnrolled ? theme.textSecondary : theme.primary}
+                />
+              </View>
             </View>
           );
         })
       )}
-      <ThemeToggle />
+      <View style={styles.themeContainer}>
+        <ThemeToggle />
+      </View>
     </ScrollView>
   );
 };
@@ -165,31 +180,59 @@ export default StudentCourses;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+    paddingTop: 32,
     paddingBottom: 40,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "600",
-    textAlign: "center",
-    marginVertical: 16,
+    fontSize: 28,
+    fontWeight: "700",
+    marginBottom: 24,
+  },
+  loader: {
+    marginTop: 40,
+  },
+  emptyState: {
+    padding: 32,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    alignItems: "center",
   },
   courseCard: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    borderColor: "#e5e7eb",
-    backgroundColor: "#fff",
+    borderWidth: 1.5,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
   },
   courseTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "600",
-    marginBottom: 4,
+    marginBottom: 8,
+  },
+  department: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 15,
+    marginBottom: 12,
+    lineHeight: 22,
+  },
+  capacity: {
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  buttonContainer: {
+    marginTop: 8,
+    borderRadius: 12,
+    overflow: "hidden",
   },
   text: {
     fontSize: 14,
-    marginBottom: 4,
+  },
+  themeContainer: {
+    marginTop: 24,
   },
 });
 

@@ -20,16 +20,23 @@ const Home = () => {
 
   return (
     <View style={containerStyle}>
-      <Text style={textStyle}>Home Tab</Text>
-      <Text style={textStyle}>Count: {count}</Text>
-      <View style={styles.linkContainer}>
-        <Link href="/rank_list" style={styles.link}>
-          <Text style={[styles.linkText, { color: theme.text }]}>
-            View Rank List
-          </Text>
+      <View style={styles.header}>
+        <Text style={[styles.welcomeText, { color: theme.text }]}>Welcome!</Text>
+        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
+          Explore your dashboard
+        </Text>
+      </View>
+      
+      <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <Text style={[styles.cardTitle, { color: theme.text }]}>Quick Actions</Text>
+        <Link href="/rank_list" style={[styles.actionButton, { backgroundColor: theme.primary }]}>
+          <Text style={styles.actionButtonText}>View Rank List</Text>
         </Link>
       </View>
-      <ThemeToggle />
+
+      <View style={styles.themeContainer}>
+        <ThemeToggle />
+      </View>
     </View>
   );
 };
@@ -38,28 +45,47 @@ export default Home;
 
 const styles = StyleSheet.create({
   myview: {
-    marginHorizontal: 20,
     flex: 1,
-    justifyContent: "center",
-    gap: 16,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+  },
+  header: {
+    marginBottom: 32,
+  },
+  welcomeText: {
+    fontSize: 32,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+  },
+  card: {
+    padding: 24,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    marginBottom: 24,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  actionButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  actionButtonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  themeContainer: {
+    marginTop: "auto",
   },
   text: {
     fontSize: 18,
-    textAlign: "center",
-  },
-  linkContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  link: {
-    padding: 12,
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: "#3b82f6",
-    backgroundColor: "#eff6ff",
-  },
-  linkText: {
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

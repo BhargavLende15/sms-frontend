@@ -36,7 +36,7 @@ const Profile = () => {
     [theme]
   );
   const inputStyle = useMemo(
-    () => [styles.input, { color: theme.text, borderColor: theme.text }],
+    () => [styles.input, { color: theme.text, borderColor: theme.border, backgroundColor: theme.input }],
     [theme]
   );
   const labelStyle = useMemo(
@@ -75,7 +75,7 @@ const Profile = () => {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Profile</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Profile</Text>
         <View style={styles.fieldGroup}>
           <Text style={labelStyle}>Full Name</Text>
           <TextInput
@@ -145,35 +145,36 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingHorizontal: 24,
+    paddingTop: 32,
   },
   scrollContent: {
     paddingBottom: 32,
-    gap: 16,
+    gap: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "600",
+    fontSize: 28,
+    fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   fieldGroup: {
-    gap: 4,
+    gap: 8,
   },
   label: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   input: {
-    marginVertical: 4,
-    height: 48,
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    backgroundColor: "#fff",
+    height: 52,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
   },
   actions: {
-    marginTop: 8,
+    marginTop: 12,
+    borderRadius: 12,
+    overflow: "hidden",
   },
 });

@@ -5,12 +5,30 @@ import { ThemeMode, toggleTheme, setTheme } from "../store/themeSlice";
 
 const lightTheme = {
   background: "#ffffff",
-  text: "#1c1c1e",
+  surface: "#f9fafb",
+  text: "#111827",
+  textSecondary: "#6b7280",
+  border: "#e5e7eb",
+  primary: "#3b82f6",
+  primaryDark: "#2563eb",
+  error: "#dc2626",
+  success: "#10b981",
+  card: "#ffffff",
+  input: "#ffffff",
 };
 
 const darkTheme = {
-  background: "#1c1c1e",
-  text: "#f5f5f5",
+  background: "#111827",
+  surface: "#1f2937",
+  text: "#f9fafb",
+  textSecondary: "#d1d5db",
+  border: "#374151",
+  primary: "#60a5fa",
+  primaryDark: "#3b82f6",
+  error: "#ef4444",
+  success: "#34d399",
+  card: "#1f2937",
+  input: "#374151",
 };
 
 export interface ThemeContextValue {
