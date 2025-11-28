@@ -1,53 +1,49 @@
-import {
-  ActivityIndicator,
-  Button,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import React, { useState } from "react";
-import { Link } from "expo-router";
-const index = () => {
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { useRouter } from "expo-router";
+import { useUser } from "../hooks/useUser";
+
+const Index = () => {
+  const { user, authChecked } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authChecked) {
+      return;
+    }
+
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+
+    const userType = user?.type?.toLowerCase();
+    const route = userType === "admin" ? "/admin_home" : "/home";
+    router.replace(route);
+  }, [authChecked, user]);
+
   return (
-    <KeyboardAvoidingView style={styles.myview}>
-      <Link href="/login">
-        <Text>Login</Text>
-      </Link>
-      <Link href="/register">
-        <Text>Register</Text>
-      </Link>
-      <Link href="/profile">
-        <Text>Profile</Text>
-      </Link>
-      <Link href="/admin_profile">
-        <Text>Admin Profile</Text>
-      </Link>
-      <Link href="/counter">
-        <Text>Counter</Text>
-      </Link>
-      <Link href="/rank_list">
-        <Text>Rank List</Text>
-      </Link>
-    </KeyboardAvoidingView>
+    <View style={styles.container}>
+      <ActivityIndicator size="large" />
+      <Text style={styles.statusText}>
+        {authChecked ? "Redirecting..." : "Checking session..."}
+      </Text>
+    </View>
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
-  myview: {
-    marginHorizontal: 20,
+  container: {
     flex: 1,
     justifyContent: "center",
-  },
-  input: {
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
+    alignItems: "center",
     backgroundColor: "#fff",
+  },
+  statusText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#333",
   },
 });
