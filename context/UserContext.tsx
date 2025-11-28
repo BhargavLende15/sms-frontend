@@ -158,13 +158,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await SecureStore.deleteItemAsync("user");
-      dispatch(resetUser());
-      dispatch(setAuthChecked(false));
-      router.replace("/login");
-      await checkLogin();
     } catch (error) {
-      console.log("Error during logout:", error);
+      console.log("Error deleting from SecureStore:", error);
     }
+    // Always clear state and redirect, even if SecureStore deletion fails
+    dispatch(resetUser());
+    router.replace("/login");
   };
   useEffect(() => {
     checkLogin();

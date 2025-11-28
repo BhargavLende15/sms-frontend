@@ -11,12 +11,13 @@ const AdminUserOnly = ({ children }: { children: ReactNode }) => {
     console.log("User in AdminUserOnly:", user);
     if (authChecked && user == null) {
       router.replace("/login");
+      return;
     }
     if (authChecked && user != null && user.type !== "admin") {
       Alert.alert("Access Denied: Admin Users Only");
       router.replace("/");
     }
-  }, [user]);
+  }, [user, authChecked]);
   if (!authChecked || !user) {
     console.log("loading in AdminUserOnly:");
     return <Text>Loading</Text>;

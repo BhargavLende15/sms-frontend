@@ -8,17 +8,18 @@ const UserOnly = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("User in UserOnly:", user.type);
+    console.log("User in UserOnly:", user);
     //authentication
     if (authChecked && user == null) {
       router.replace("/login");
+      return;
     }
     //authorization
     if (authChecked && user != null && user.type !== "student") {
       Alert.alert("Access Denied: Users Only");
       router.replace("/");
     }
-  }, [user]);
+  }, [user, authChecked]);
   if (!authChecked || !user) {
     return <Text>Loading</Text>;
   }

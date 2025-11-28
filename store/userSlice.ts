@@ -28,6 +28,7 @@ const userSlice = createSlice({
     resetUser(state) {
       state.user = null;
       state.loading = false;
+      state.authChecked = false;
     },
   },
 });
