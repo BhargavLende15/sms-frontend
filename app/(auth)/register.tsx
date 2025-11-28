@@ -28,6 +28,7 @@ const index = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [department, setDepartment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { register } = useUser();
   const { theme } = useTheme();
   const containerStyle = useMemo(
@@ -57,18 +58,49 @@ const index = () => {
     () => dayjs(dateOfBirth).format("YYYY-MM-DD"),
     [dateOfBirth]
   );
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!name.trim()) {
+      newErrors.name = "Full name is required";
+    }
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      newErrors.email = "Enter a valid email";
+    }
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    if (!mobileNumber.trim()) {
+      newErrors.mobileNumber = "Mobile number is required";
+    }
+    if (!department.trim()) {
+      newErrors.department = "Department is required";
+    }
+    if (!dateOfBirth) {
+      newErrors.dateOfBirth = "Date of birth is required";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleRegister = async () => {
+    if (!validate()) {
+      return;
+    }
     setLoading(true);
     try {
       await register({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
         password,
         gender,
         type,
         dateOfBirth: dayjs(dateOfBirth).format("YYYY-MM-DD"),
-        mobileNumber,
-        department,
+        mobileNumber: mobileNumber.trim(),
+        department: department.trim(),
       });
     } catch (error) {
       console.log(error);
@@ -86,6 +118,7 @@ const index = () => {
         value={name}
         onChangeText={setName}
       />
+      {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
       <TextInput
         style={inputStyle}
         placeholder="Email"
@@ -93,6 +126,7 @@ const index = () => {
         value={email}
         onChangeText={setEmail}
       />
+      {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
       <TextInput
         secureTextEntry={true}
         style={inputStyle}
@@ -101,6 +135,9 @@ const index = () => {
         value={password}
         onChangeText={setPassword}
       />
+      {errors.password ? (
+        <Text style={styles.errorText}>{errors.password}</Text>
+      ) : null}
       <TextInput
         style={inputStyle}
         placeholder="Mobile Number"
@@ -109,6 +146,9 @@ const index = () => {
         onChangeText={setMobileNumber}
         keyboardType="phone-pad"
       />
+      {errors.mobileNumber ? (
+        <Text style={styles.errorText}>{errors.mobileNumber}</Text>
+      ) : null}
       <TextInput
         style={inputStyle}
         placeholder="Department"
@@ -116,6 +156,9 @@ const index = () => {
         value={department}
         onChangeText={setDepartment}
       />
+      {errors.department ? (
+        <Text style={styles.errorText}>{errors.department}</Text>
+      ) : null}
       <View style={pickerStyle}>
         <Picker
           selectedValue={gender}
@@ -143,6 +186,9 @@ const index = () => {
         title={`Select DOB: ${dobLabel}`}
         onPress={() => setShowDatePicker(true)}
       />
+      {errors.dateOfBirth ? (
+        <Text style={styles.errorText}>{errors.dateOfBirth}</Text>
+      ) : null}
       {showDatePicker && (
         <DateTimePicker
           value={dateOfBirth}
@@ -189,5 +235,15 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     backgroundColor: "#fff",
+  },
+  errorText: {
+    color: "#dc2626",
+    fontSize: 12,
+    marginBottom: 8,
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderRadius: 6,
+    marginVertical: 6,
   },
 });

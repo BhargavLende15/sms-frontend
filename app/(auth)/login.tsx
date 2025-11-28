@@ -15,6 +15,7 @@ import ThemeToggle from "../../components/ThemeToggle";
 const index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const { login } = useUser();
   const [loading, setLoading] = useState(false);
   const { theme } = useTheme();
@@ -32,10 +33,29 @@ const index = () => {
     [theme]
   );
 
+  const validate = () => {
+    const newErrors: { email?: string; password?: string } = {};
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      newErrors.email = "Enter a valid email";
+    }
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleLogin = async () => {
+    if (!validate()) {
+      return;
+    }
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email.trim(), password);
     } catch (error) {
       console.log(error);
     } finally {
@@ -51,7 +71,10 @@ const index = () => {
         placeholderTextColor="#9ca3af"
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
+      {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
       <TextInput
         secureTextEntry={true}
         style={inputStyle}
@@ -60,6 +83,9 @@ const index = () => {
         value={password}
         onChangeText={setPassword}
       />
+      {errors.password ? (
+        <Text style={styles.errorText}>{errors.password}</Text>
+      ) : null}
       {loading ? (
         <ActivityIndicator size={"small"}></ActivityIndicator>
       ) : (
@@ -90,5 +116,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     backgroundColor: "#fff",
+  },
+  errorText: {
+    color: "#dc2626",
+    fontSize: 12,
+    marginBottom: 8,
   },
 });
