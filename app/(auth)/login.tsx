@@ -7,15 +7,30 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
-import { Link, useRouter } from "expo-router";
-import axios from "axios";
+import React, { useMemo, useState } from "react";
+import { Link } from "expo-router";
 import { useUser } from "../../hooks/useUser";
+import { useTheme } from "../../hooks/useTheme";
+import ThemeToggle from "../../components/ThemeToggle";
 const index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useUser();
   const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
+
+  const containerStyle = useMemo(
+    () => [styles.myview, { backgroundColor: theme.background }],
+    [theme]
+  );
+  const inputStyle = useMemo(
+    () => [styles.input, { color: theme.text, borderColor: theme.text }],
+    [theme]
+  );
+  const linkStyle = useMemo(
+    () => ({ textAlign: "center", color: theme.text }),
+    [theme]
+  );
 
   const handleLogin = async () => {
     setLoading(true);
@@ -29,17 +44,19 @@ const index = () => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.myview}>
+    <KeyboardAvoidingView style={containerStyle}>
       <TextInput
-        style={styles.input}
+        style={inputStyle}
         placeholder="Email"
+        placeholderTextColor="#9ca3af"
         value={email}
         onChangeText={setEmail}
       />
       <TextInput
         secureTextEntry={true}
-        style={styles.input}
+        style={inputStyle}
         placeholder="Password"
+        placeholderTextColor="#9ca3af"
         value={password}
         onChangeText={setPassword}
       />
@@ -50,9 +67,10 @@ const index = () => {
           <Button title="Login" onPress={handleLogin} />
         </>
       )}
-      <Link href="/register" style={{ textAlign: "center" }}>
-        <Text>Register Instead?</Text>
+      <Link href="/register" style={linkStyle}>
+        <Text style={{ color: theme.text }}>Register Instead?</Text>
       </Link>
+      <ThemeToggle />
     </KeyboardAvoidingView>
   );
 };

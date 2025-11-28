@@ -1,16 +1,19 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import { Stack } from "expo-router";
 import { UserProvider } from "../context/UserContext";
-import { Provider } from "react-redux";
-import { smsStore } from "../store/store";
+import { Provider, useSelector } from "react-redux";
+import { smsStore, RootState } from "../store/store";
+import { ThemeProvider } from "../context/ThemeContext";
 
 const _layout = () => {
   return (
     <Provider store={smsStore}>
-      <UserProvider>
-        <Stack></Stack>
-      </UserProvider>
+      <ThemeProvider>
+        <UserProvider>
+          <Stack></Stack>
+        </UserProvider>
+      </ThemeProvider>
     </Provider>
   );
 };

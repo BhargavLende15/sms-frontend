@@ -1,28 +1,31 @@
-import {
-  ActivityIndicator,
-  Button,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import React, { useState } from "react";
-import { Link, useRouter } from "expo-router";
-import axios from "axios";
-import { useUser } from "../../hooks/useUser";
+import { StyleSheet, Text, View } from "react-native";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectCount } from "../../store/counterSlice";
-const home = () => {
+import ThemeToggle from "../../components/ThemeToggle";
+import { useTheme } from "../../hooks/useTheme";
+
+const Home = () => {
   const count = useSelector(selectCount);
+  const { theme } = useTheme();
+  const containerStyle = useMemo(
+    () => [styles.myview, { backgroundColor: theme.background }],
+    [theme]
+  );
+  const textStyle = useMemo(
+    () => [styles.text, { color: theme.text }],
+    [theme]
+  );
+
   return (
-    <View style={styles.myview}>
-      <Text> Home Tab Count:{count}</Text>
+    <View style={containerStyle}>
+      <Text style={textStyle}>Home Tab Count: {count}</Text>
+      <ThemeToggle />
     </View>
   );
 };
 
-export default home;
+export default Home;
 
 const styles = StyleSheet.create({
   myview: {
@@ -30,12 +33,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-  input: {
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
-    backgroundColor: "#fff",
+  text: {
+    fontSize: 18,
   },
 });
