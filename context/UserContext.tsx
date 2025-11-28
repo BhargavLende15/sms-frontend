@@ -55,8 +55,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       alert("User signed in:" + response.data.email);
       dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));
-    } catch (error) {
-      alert("Error occured at sign in");
+    } catch (error: any) {
+      const message =
+        error.response?.data || "Error occurred at sign in. Please try again.";
+      alert(message);
     } finally {
       dispatch(setLoading(false));
     }
@@ -95,8 +97,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       });
       dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));
-    } catch (error) {
-      alert("Error occured at register" + error);
+    } catch (error: any) {
+      const message =
+        error.response?.data || "Error occurred during registration.";
+      alert(message);
     } finally {
       dispatch(setLoading(false));
     }
@@ -142,9 +146,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));
       alert("Profile updated successfully");
-    } catch (error) {
-      console.log("Profile update failed", error);
-      alert("Failed to update profile");
+    } catch (error: any) {
+      const message =
+        error.response?.data || "Failed to update profile. Please try again.";
+      alert(message);
     } finally {
       dispatch(setLoading(false));
     }

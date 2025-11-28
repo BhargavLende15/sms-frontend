@@ -75,6 +75,8 @@ const index = () => {
     }
     if (!mobileNumber.trim()) {
       newErrors.mobileNumber = "Mobile number is required";
+    } else if (!/^[0-9]{10}$/.test(mobileNumber.trim())) {
+      newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
     }
     if (!department.trim()) {
       newErrors.department = "Department is required";
