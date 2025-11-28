@@ -29,7 +29,14 @@ const Index = () => {
     }
 
     const userType = user?.type?.toLowerCase();
-    const route = userType === "admin" ? "/admin_home" : "/home";
+    let route = "/home";
+    if (userType === "admin") {
+      route = "/admin_home";
+    } else if (userType === "teacher") {
+      route = "/teacher_home";
+    } else if (userType === "student") {
+      route = "/home";
+    }
     router.replace(route);
   }, [authChecked, user]);
 

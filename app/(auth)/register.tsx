@@ -181,6 +181,7 @@ const index = () => {
           style={pickerTextStyle}
         >
           <Picker.Item label="Student" value="student" />
+          <Picker.Item label="Teacher" value="teacher" />
           <Picker.Item label="Admin" value="admin" />
         </Picker>
       </View>
