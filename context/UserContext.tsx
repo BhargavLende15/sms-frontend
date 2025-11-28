@@ -1,7 +1,10 @@
 import axios from "axios";
-import { createContext, useState, ReactNode, useEffect } from "react";
+import { createContext, ReactNode, useEffect } from "react";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { resetUser, setAuthChecked, setLoading, setUser } from "../store/userSlice";
 
 export interface UserContextType {
   user: any | null;
@@ -16,28 +19,27 @@ export const UserContext = createContext<UserContextType | null>(null);
 export function UserProvider({ children }: { children: ReactNode }) {
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:9099";
   const DEFAULT_USER_TYPE = "student";
-  const [loading, setLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<any | null>(null);
-  const [authChecked, setAuthChecked] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const { user, authChecked } = useSelector((state: RootState) => state.user);
   const router = useRouter();
   const login = async (email: string, password: string) => {
-    setLoading(true);
+    dispatch(setLoading(true));
     try {
       const response: any = await axios.post(`${API_BASE_URL}/users/sign-in`, {
         email: email,
         password: password,
       });
       alert("User signed in:" + response.data.email);
-      setUser(response.data);
+      dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));
     } catch (error) {
       alert("Error occured at sign in");
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
   };
   const register = async (email: string, password: string) => {
-    setLoading(true);
+    dispatch(setLoading(true));
 
     try {
       const response: any = await axios.post(`${API_BASE_URL}/users`, {
@@ -45,12 +47,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
         password: password,
         type: DEFAULT_USER_TYPE,
       });
-      setUser(response.data);
+      dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));
     } catch (error) {
       alert("Error occured at register" + error);
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
   };
   const checkLogin = async () => {
@@ -58,21 +60,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
       let result = await SecureStore.getItemAsync("user");
       console.log("Stored user:", result);
       if (result) {
-        setUser(JSON.parse(result));
+        dispatch(setUser(JSON.parse(result)));
       } else {
-        setUser(null);
+        dispatch(setUser(null));
       }
     } catch (error) {
       console.log("Error during app laod:", error);
     } finally {
-      setAuthChecked(true);
+      dispatch(setAuthChecked(true));
     }
   };
 
   const logout = async () => {
     try {
       await SecureStore.deleteItemAsync("user");
-      setUser(null);
+      dispatch(resetUser());
     } catch (error) {
       console.log("Error during logout:", error);
     } finally {
