@@ -13,9 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-        "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "com.rcoem.sms"
+       "config": {
+        "usesNonExemptEncryption": false
+      },
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -23,23 +24,26 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,  
-      // "googleServicesFile": "./google-services.json",
-      "package": "com.rcoem.sms"
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins":[
+    "plugins": [
       "expo-router",
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
       [
         "expo-build-properties",
         {
           "ios": {
             "useFrameworks": "static"
           }
+        }
+      ],
+            [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
         }
       ]
     ]

@@ -1,17 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Stack } from "expo-router";
-import { UserProvider } from "../context/UserContext";
-import { Provider } from "react-redux";
-import { smsStore } from "../store/store";
+import { Stack, Tabs } from "expo-router";
+import UserOnly from "../../components/UserOnly";
 
 const _layout = () => {
   return (
-    <Provider store={smsStore}>
-      <UserProvider>
-        <Stack></Stack>
-      </UserProvider>
-    </Provider>
+    <UserOnly>
+      <Tabs screenOptions={{ headerShown: false }}>
+        <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+        <Tabs.Screen name="home" options={{ title: "Home" }} />
+      </Tabs>
+    </UserOnly>
   );
 };
 

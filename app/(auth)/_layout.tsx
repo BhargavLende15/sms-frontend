@@ -1,17 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Stack } from "expo-router";
-import { UserProvider } from "../context/UserContext";
-import { Provider } from "react-redux";
-import { smsStore } from "../store/store";
+import GuestOnly from "../../components/GuestOnly";
 
 const _layout = () => {
   return (
-    <Provider store={smsStore}>
-      <UserProvider>
-        <Stack></Stack>
-      </UserProvider>
-    </Provider>
+    <GuestOnly>
+      <Stack screenOptions={{ headerShown: false }}></Stack>
+    </GuestOnly>
   );
 };
 
