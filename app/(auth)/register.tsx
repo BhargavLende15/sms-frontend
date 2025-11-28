@@ -15,6 +15,7 @@ import ThemeToggle from "../../components/ThemeToggle";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import dayjs from "dayjs";
+import { Platform } from "react-native";
 
 const index = () => {
   const [name, setName] = useState("");
@@ -127,13 +128,16 @@ const index = () => {
         <DateTimePicker
           value={dateOfBirth}
           mode="date"
-          display="default"
+          display={Platform.OS === "ios" ? "inline" : "calendar"}
           onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
+            if (Platform.OS !== "ios") {
+              setShowDatePicker(false);
+            }
             if (selectedDate) {
               setDateOfBirth(selectedDate);
             }
           }}
+          maximumDate={new Date()}
         />
       )}
       {loading ? (
