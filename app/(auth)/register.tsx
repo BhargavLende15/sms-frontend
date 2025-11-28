@@ -25,6 +25,8 @@ const index = () => {
   const [type, setType] = useState("student");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [department, setDepartment] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useUser();
   const { theme } = useTheme();
@@ -65,6 +67,8 @@ const index = () => {
         gender,
         type,
         dateOfBirth: dayjs(dateOfBirth).format("YYYY-MM-DD"),
+        mobileNumber,
+        department,
       });
     } catch (error) {
       console.log(error);
@@ -96,6 +100,21 @@ const index = () => {
         placeholderTextColor="#9ca3af"
         value={password}
         onChangeText={setPassword}
+      />
+      <TextInput
+        style={inputStyle}
+        placeholder="Mobile Number"
+        placeholderTextColor="#9ca3af"
+        value={mobileNumber}
+        onChangeText={setMobileNumber}
+        keyboardType="phone-pad"
+      />
+      <TextInput
+        style={inputStyle}
+        placeholder="Department"
+        placeholderTextColor="#9ca3af"
+        value={department}
+        onChangeText={setDepartment}
       />
       <View style={pickerStyle}>
         <Picker

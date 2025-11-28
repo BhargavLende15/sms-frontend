@@ -4,11 +4,17 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { resetUser, setAuthChecked, setLoading, setUser } from "../store/userSlice";
+import {
+  resetUser,
+  setAuthChecked,
+  setLoading,
+  setUser,
+} from "../store/userSlice";
 
 export interface UserContextType {
   user: any | null;
   authChecked: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (payload: {
     email: string;
@@ -17,6 +23,14 @@ export interface UserContextType {
     dateOfBirth: string;
     gender: string;
     type: string;
+    mobileNumber: string;
+    department: string;
+  }) => Promise<void>;
+  updateProfile: (payload: {
+    name?: string;
+    email?: string;
+    mobileNumber?: string;
+    department?: string;
   }) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -27,7 +41,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:9099";
   const DEFAULT_USER_TYPE = "student";
   const dispatch = useDispatch();
-  const { user, authChecked } = useSelector((state: RootState) => state.user);
+  const { user, authChecked, loading } = useSelector(
+    (state: RootState) => state.user
+  );
   const router = useRouter();
   const login = async (email: string, password: string) => {
     dispatch(setLoading(true));
@@ -52,6 +68,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     dateOfBirth,
     gender,
     type,
+    mobileNumber,
+    department,
   }: {
     email: string;
     password: string;
@@ -59,6 +77,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     dateOfBirth: string;
     gender: string;
     type: string;
+    mobileNumber: string;
+    department: string;
   }) => {
     dispatch(setLoading(true));
 
@@ -70,6 +90,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         name,
         dateOfBirth,
         gender,
+        mobileNumber,
+        department,
       });
       dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));
@@ -95,6 +117,39 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateProfile = async ({
+    name,
+    email,
+    mobileNumber,
+    department,
+  }: {
+    name?: string;
+    email?: string;
+    mobileNumber?: string;
+    department?: string;
+  }) => {
+    if (!user) {
+      return;
+    }
+    dispatch(setLoading(true));
+    try {
+      const response = await axios.put(`${API_BASE_URL}/users/${user.id}`, {
+        name,
+        email,
+        mobileNumber,
+        department,
+      });
+      dispatch(setUser(response.data));
+      await SecureStore.setItemAsync("user", JSON.stringify(response.data));
+      alert("Profile updated successfully");
+    } catch (error) {
+      console.log("Profile update failed", error);
+      alert("Failed to update profile");
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
   const logout = async () => {
     try {
       await SecureStore.deleteItemAsync("user");
@@ -115,6 +170,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         logout,
         register,
         authChecked,
+        loading,
+        updateProfile,
       }}
     >
       {children}
