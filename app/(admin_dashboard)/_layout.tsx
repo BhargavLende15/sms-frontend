@@ -13,6 +13,7 @@ const _layout = () => {
           options={{ title: "Admin Profile" }}
         />
         <Tabs.Screen name="admin_home" options={{ title: "Admin Home" }} />
+        <Tabs.Screen name="courses" options={{ title: "Courses" }} />
       </Tabs>
     </AdminUserOnly>
   );
