@@ -94,9 +94,18 @@ const TeacherHome = () => {
       setPoints("");
       setSelectedStudent(null);
       await fetchStudents();
-      alert("Points updated successfully");
+      alert(`Successfully added ${points} points to ${selectedStudent.name}!`);
     } catch (error: any) {
-      const message = error.response?.data || "Failed to update points";
+      let message = "Failed to update points. Please try again.";
+      if (error.response?.status === 404) {
+        message = "Student not found. Please refresh the list and try again.";
+      } else if (error.response?.status === 403 || error.response?.status === 401) {
+        message = "You don't have permission to award points. Only teachers can award points.";
+      } else if (error.response?.status === 400) {
+        message = error.response.data || "Invalid points value. Please enter a positive number.";
+      } else if (error.response?.data) {
+        message = error.response.data;
+      }
       alert(message);
     } finally {
       setUpdating(false);

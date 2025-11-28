@@ -105,9 +105,16 @@ const AdminCourses = () => {
       });
       resetForm();
       await fetchCourses();
-      alert("Course created successfully");
+      alert(`Course "${title.trim()}" created successfully!`);
     } catch (error: any) {
-      const message = error.response?.data || "Failed to create course";
+      let message = "Failed to create course. Please try again.";
+      if (error.response?.status === 400) {
+        message = error.response.data || "Invalid course information. Please check all fields and try again.";
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        message = "You don't have permission to create courses. Only admins can create courses.";
+      } else if (error.response?.data) {
+        message = error.response.data;
+      }
       alert(message);
     } finally {
       setSubmitting(false);

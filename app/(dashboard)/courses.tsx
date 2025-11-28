@@ -81,11 +81,11 @@ const StudentCourses = () => {
 
   const handleEnroll = async (courseId: string) => {
     if (!user?.id) {
-      alert("You must be logged in to enroll");
+      alert("You must be logged in to enroll in courses.");
       return;
     }
     if (user.type !== "student") {
-      alert("Only students can enroll in courses");
+      alert("Only students can enroll in courses.");
       return;
     }
     setEnrollLoadingId(courseId);
@@ -94,9 +94,24 @@ const StudentCourses = () => {
         studentId: user.id,
       });
       await fetchEnrollments();
-      alert("Enrolled successfully");
+      alert("Successfully enrolled in course!");
     } catch (error: any) {
-      const message = error.response?.data || "Failed to enroll";
+      let message = "Failed to enroll in course. Please try again.";
+      if (error.response?.status === 404) {
+        if (error.response?.data?.includes("Student")) {
+          message = "Student account not found. Please contact support.";
+        } else if (error.response?.data?.includes("Course")) {
+          message = "Course not found. It may have been removed.";
+        } else {
+          message = error.response.data || "Resource not found. Please refresh and try again.";
+        }
+      } else if (error.response?.status === 409) {
+        message = "You are already enrolled in this course.";
+      } else if (error.response?.status === 400) {
+        message = error.response.data || "Invalid request. Please check the course details and try again.";
+      } else if (error.response?.data) {
+        message = error.response.data;
+      }
       alert(message);
       console.log("Enrollment error:", error.response?.data || error.message);
     } finally {

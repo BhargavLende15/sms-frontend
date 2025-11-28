@@ -52,13 +52,48 @@ export function UserProvider({ children }: { children: ReactNode }) {
         email: email,
         password: password,
       });
-      alert("User signed in:" + response.data.email);
-      dispatch(setUser(response.data));
-      await SecureStore.setItemAsync("user", JSON.stringify(response.data));
+      console.log("Login response:", response.status, response.data);
+      if (response.status >= 200 && response.status < 300) {
+        if (response.data) {
+          dispatch(setUser(response.data));
+          try {
+            await SecureStore.setItemAsync("user", JSON.stringify(response.data));
+          } catch (storeError) {
+            console.log("Error saving to SecureStore:", storeError);
+            // Don't fail login if SecureStore fails, user is still logged in
+          }
+          // No alert on successful login - user will be redirected automatically
+        } else {
+          console.log("Warning: Login succeeded but no user data received");
+        }
+      } else {
+        throw new Error(`Unexpected status code: ${response.status}`);
+      }
     } catch (error: any) {
-      const message =
-        error.response?.data || "Error occurred at sign in. Please try again.";
+      console.log("Login error:", error);
+      console.log("Error response:", error.response);
+      let message = "Login failed. Please try again.";
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status === 404) {
+          message = "User not found. Please check your email or register first.";
+        } else if (error.response.status === 401) {
+          message = "Invalid email or password. Please try again.";
+        } else if (error.response.data) {
+          // Handle both string and object responses
+          message = typeof error.response.data === 'string' 
+            ? error.response.data 
+            : error.response.data.message || JSON.stringify(error.response.data);
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        message = "Network error. Please check your connection and try again.";
+      } else {
+        // Something else happened
+        message = error.message || "An unexpected error occurred. Please try again.";
+      }
       alert(message);
+      throw error; // Re-throw to prevent navigation
     } finally {
       dispatch(setLoading(false));
     }
@@ -95,12 +130,66 @@ export function UserProvider({ children }: { children: ReactNode }) {
         mobileNumber,
         department,
       });
-      dispatch(setUser(response.data));
-      await SecureStore.setItemAsync("user", JSON.stringify(response.data));
+      console.log("Registration response:", response.status, response.data);
+      // Check if response is successful (status 200-299)
+      if (response.status >= 200 && response.status < 300) {
+        if (response.data) {
+          dispatch(setUser(response.data));
+          try {
+            await SecureStore.setItemAsync("user", JSON.stringify(response.data));
+          } catch (storeError) {
+            console.log("Error saving to SecureStore:", storeError);
+            // Don't fail registration if SecureStore fails, user is still registered
+          }
+          alert("Registration successful! Welcome to SMS.");
+        } else {
+          console.log("Warning: Registration succeeded but no user data received");
+          alert("Registration successful! Welcome to SMS.");
+        }
+      } else {
+        throw new Error(`Unexpected status code: ${response.status}`);
+      }
     } catch (error: any) {
-      const message =
-        error.response?.data || "Error occurred during registration.";
+      console.log("Registration error:", error);
+      console.log("Error response:", error.response);
+      let message = "Registration failed. Please try again.";
+      
+      if (error.response) {
+        // Server responded with error status
+        const errorData = error.response.data;
+        const errorStatus = error.response.status;
+        
+        if (errorStatus === 409) {
+          // Handle duplicate resource
+          const errorMessage = typeof errorData === 'string' ? errorData : String(errorData || '');
+          if (errorMessage.includes("Email") || errorMessage.includes("email")) {
+            message = "This email is already registered. Please use a different email or login instead.";
+          } else if (errorMessage.includes("Mobile") || errorMessage.includes("mobile")) {
+            message = "This mobile number is already registered. Please use a different mobile number.";
+          } else {
+            message = errorMessage || "This information is already registered. Please check your details.";
+          }
+        } else if (errorStatus === 400) {
+          // Handle bad request
+          message = typeof errorData === 'string' 
+            ? errorData 
+            : "Invalid information provided. Please check all fields and try again.";
+        } else {
+          // Other error statuses
+          message = typeof errorData === 'string' 
+            ? errorData 
+            : errorData?.message || `Server error (${errorStatus}). Please try again.`;
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        message = "Network error. Please check your connection and try again.";
+      } else {
+        // Something else happened
+        message = error.message || "An unexpected error occurred. Please try again.";
+      }
+      
       alert(message);
+      throw error; // Re-throw to prevent navigation
     } finally {
       dispatch(setLoading(false));
     }
@@ -133,6 +222,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     department?: string;
   }) => {
     if (!user) {
+      alert("You must be logged in to update your profile.");
       return;
     }
     dispatch(setLoading(true));
@@ -145,10 +235,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
       });
       dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));
-      alert("Profile updated successfully");
+      alert("Profile updated successfully!");
     } catch (error: any) {
-      const message =
-        error.response?.data || "Failed to update profile. Please try again.";
+      let message = "Failed to update profile. Please try again.";
+      if (error.response?.status === 409) {
+        if (error.response?.data?.includes("Email")) {
+          message = "This email is already in use. Please choose a different email.";
+        } else if (error.response?.data?.includes("Mobile")) {
+          message = "This mobile number is already in use. Please choose a different mobile number.";
+        } else {
+          message = error.response.data || "This information is already in use. Please check your details.";
+        }
+      } else if (error.response?.status === 400) {
+        message = error.response.data || "Invalid information provided. Please check all fields and try again.";
+      } else if (error.response?.status === 404) {
+        message = "User not found. Please log in again.";
+      } else if (error.response?.data) {
+        message = error.response.data;
+      }
       alert(message);
     } finally {
       dispatch(setLoading(false));
