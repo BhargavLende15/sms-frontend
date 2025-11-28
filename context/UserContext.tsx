@@ -10,7 +10,14 @@ export interface UserContextType {
   user: any | null;
   authChecked: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (payload: {
+    email: string;
+    password: string;
+    name: string;
+    dateOfBirth: string;
+    gender: string;
+    type: string;
+  }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -38,14 +45,31 @@ export function UserProvider({ children }: { children: ReactNode }) {
       dispatch(setLoading(false));
     }
   };
-  const register = async (email: string, password: string) => {
+  const register = async ({
+    email,
+    password,
+    name,
+    dateOfBirth,
+    gender,
+    type,
+  }: {
+    email: string;
+    password: string;
+    name: string;
+    dateOfBirth: string;
+    gender: string;
+    type: string;
+  }) => {
     dispatch(setLoading(true));
 
     try {
       const response: any = await axios.post(`${API_BASE_URL}/users`, {
         email: email,
         password: password,
-        type: DEFAULT_USER_TYPE,
+        type: type || DEFAULT_USER_TYPE,
+        name,
+        dateOfBirth,
+        gender,
       });
       dispatch(setUser(response.data));
       await SecureStore.setItemAsync("user", JSON.stringify(response.data));

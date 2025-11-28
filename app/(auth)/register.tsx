@@ -12,9 +12,18 @@ import { Link } from "expo-router";
 import { useUser } from "../../hooks/useUser";
 import { useTheme } from "../../hooks/useTheme";
 import ThemeToggle from "../../components/ThemeToggle";
+import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import dayjs from "dayjs";
+
 const index = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [gender, setGender] = useState("male");
+  const [type, setType] = useState("student");
+  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register } = useUser();
   const { theme } = useTheme();
@@ -26,15 +35,36 @@ const index = () => {
     () => [styles.input, { color: theme.text, borderColor: theme.text }],
     [theme]
   );
+  const pickerStyle = useMemo(
+    () => [
+      styles.pickerWrapper,
+      { borderColor: theme.text, backgroundColor: theme.background },
+    ],
+    [theme]
+  );
+  const pickerTextStyle = useMemo(
+    () => ({ color: theme.text }),
+    [theme]
+  );
   const linkStyle = useMemo(
     () => ({ textAlign: "center", color: theme.text }),
     [theme]
   );
-
+  const dobLabel = useMemo(
+    () => dayjs(dateOfBirth).format("YYYY-MM-DD"),
+    [dateOfBirth]
+  );
   const handleRegister = async () => {
     setLoading(true);
     try {
-      await register(email, password);
+      await register({
+        name,
+        email,
+        password,
+        gender,
+        type,
+        dateOfBirth: dayjs(dateOfBirth).format("YYYY-MM-DD"),
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -44,6 +74,13 @@ const index = () => {
 
   return (
     <KeyboardAvoidingView style={containerStyle}>
+      <TextInput
+        style={inputStyle}
+        placeholder="Full Name"
+        placeholderTextColor="#9ca3af"
+        value={name}
+        onChangeText={setName}
+      />
       <TextInput
         style={inputStyle}
         placeholder="Email"
@@ -59,6 +96,46 @@ const index = () => {
         value={password}
         onChangeText={setPassword}
       />
+      <View style={pickerStyle}>
+        <Picker
+          selectedValue={gender}
+          onValueChange={(itemValue) => setGender(itemValue)}
+          dropdownIconColor={theme.text}
+          style={pickerTextStyle}
+        >
+          <Picker.Item label="Male" value="male" />
+          <Picker.Item label="Female" value="female" />
+          <Picker.Item label="Other" value="other" />
+        </Picker>
+      </View>
+      <View style={pickerStyle}>
+        <Picker
+          selectedValue={type}
+          onValueChange={(itemValue) => setType(itemValue)}
+          dropdownIconColor={theme.text}
+          style={pickerTextStyle}
+        >
+          <Picker.Item label="Student" value="student" />
+          <Picker.Item label="Admin" value="admin" />
+        </Picker>
+      </View>
+      <Button
+        title={`Select DOB: ${dobLabel}`}
+        onPress={() => setShowDatePicker(true)}
+      />
+      {showDatePicker && (
+        <DateTimePicker
+          value={dateOfBirth}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              setDateOfBirth(selectedDate);
+            }
+          }}
+        />
+      )}
       {loading ? (
         <ActivityIndicator size={"small"}></ActivityIndicator>
       ) : (
