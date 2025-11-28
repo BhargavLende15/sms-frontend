@@ -1,53 +1,73 @@
 import {
   ActivityIndicator,
   Button,
-  KeyboardAvoidingView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
-import React, { use, useState } from "react";
-import { Link, useRouter } from "expo-router";
-import axios from "axios";
+import React, { useMemo, useState } from "react";
 import { useUser } from "../../hooks/useUser";
-const profile = () => {
-  const { user } = useUser();
-  const { logout } = useUser();
-  const [loading, setLoading] = useState(false);
+import { useTheme } from "../../hooks/useTheme";
+import ThemeToggle from "../../components/ThemeToggle";
+
+const AdminProfile = () => {
+  const { user, logout } = useUser();
+  const { theme } = useTheme();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const containerStyle = useMemo(
+    () => [styles.container, { backgroundColor: theme.background }],
+    [theme]
+  );
+  const textStyle = useMemo(
+    () => [styles.text, { color: theme.text }],
+    [theme]
+  );
+
   const handleLogout = async () => {
-    setLoading(true);
+    setLoggingOut(true);
     try {
       await logout();
-    } catch (error) {
-      console.log(error);
     } finally {
-      setLoading(false);
+      setLoggingOut(false);
     }
   };
+
   return (
-    <View style={styles.myview}>
-      <Text>Admin Profile Tab</Text>
-      <Text>Welcome {user.email}</Text>
-      <Button title="logout" onPress={handleLogout} />
+    <View style={containerStyle}>
+      <Text style={styles.title}>Admin Profile</Text>
+      <Text style={textStyle}>Welcome {user?.email}</Text>
+      <View style={styles.buttonContainer}>
+        {loggingOut ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Button title="Logout" color="#b91c1c" onPress={handleLogout} />
+        )}
+      </View>
+      <ThemeToggle />
     </View>
   );
 };
 
-export default profile;
+export default AdminProfile;
 
 const styles = StyleSheet.create({
-  myview: {
+  container: {
     marginHorizontal: 20,
     flex: 1,
     justifyContent: "center",
+    gap: 16,
   },
-  input: {
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
-    backgroundColor: "#fff",
+  title: {
+    fontSize: 24,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  text: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  buttonContainer: {
+    marginTop: 12,
   },
 });

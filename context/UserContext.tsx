@@ -159,9 +159,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     try {
       await SecureStore.deleteItemAsync("user");
       dispatch(resetUser());
+      dispatch(setAuthChecked(false));
+      router.replace("/login");
+      await checkLogin();
     } catch (error) {
       console.log("Error during logout:", error);
-    } finally {
     }
   };
   useEffect(() => {
