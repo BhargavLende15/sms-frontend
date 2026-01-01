@@ -3,32 +3,40 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { ThemeMode, toggleTheme, setTheme } from "../store/themeSlice";
 
+import { Colors, Gradients } from "../constants/colors";
+
 const lightTheme = {
-  background: "#ffffff",
-  surface: "#f9fafb",
-  text: "#111827",
-  textSecondary: "#6b7280",
-  border: "#e5e7eb",
-  primary: "#3b82f6",
-  primaryDark: "#2563eb",
-  error: "#dc2626",
-  success: "#10b981",
-  card: "#ffffff",
-  input: "#ffffff",
+  background: Colors.lightBackground,
+  surface: Colors.lightSurface,
+  text: Colors.textPrimaryLight,
+  textSecondary: Colors.textSecondaryLight,
+  border: Colors.gray200,
+  primary: Colors.primary,
+  primaryDark: Colors.primaryDark,
+  secondary: Colors.secondary,
+  error: Colors.error,
+  success: Colors.success,
+  card: Colors.lightSurface,
+  input: Colors.gray50,
+  gradient: Gradients.light,
+  primaryGradient: Gradients.primary,
 };
 
 const darkTheme = {
-  background: "#111827",
-  surface: "#1f2937",
-  text: "#f9fafb",
-  textSecondary: "#d1d5db",
-  border: "#374151",
-  primary: "#60a5fa",
-  primaryDark: "#3b82f6",
-  error: "#ef4444",
-  success: "#34d399",
-  card: "#1f2937",
-  input: "#374151",
+  background: Colors.darkBackground,
+  surface: Colors.darkSurface,
+  text: Colors.textPrimaryDark,
+  textSecondary: Colors.textSecondaryDark,
+  border: Colors.gray700,
+  primary: Colors.primaryLight,
+  primaryDark: Colors.primary,
+  secondary: Colors.secondaryLight,
+  error: Colors.error,
+  success: Colors.success,
+  card: Colors.darkSurface,
+  input: Colors.gray800,
+  gradient: Gradients.dark,
+  primaryGradient: Gradients.primary,
 };
 
 export interface ThemeContextValue {

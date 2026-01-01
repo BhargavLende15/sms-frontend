@@ -1,34 +1,58 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Stack, Tabs } from "expo-router";
-import UserOnly from "../../components/UserOnly";
+import { Tabs } from "expo-router";
 import AdminUserOnly from "../../components/AdminUserOnly";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../hooks/useTheme";
 
-const _layout = () => {
+const AdminDashboardLayout = () => {
+  const { theme } = useTheme();
+
   return (
     <AdminUserOnly>
-      <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: theme.card,
+            borderTopColor: theme.border,
+            elevation: 0,
+            shadowOpacity: 0,
+            height: 60,
+            paddingBottom: 10,
+            paddingTop: 5,
+          },
+          tabBarActiveTintColor: theme.primary,
+          tabBarInactiveTintColor: theme.textSecondary,
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "500",
+          },
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName: keyof typeof Ionicons.glyphMap;
+
+            if (route.name === "admin_home") {
+              iconName = focused ? "grid" : "grid-outline";
+            } else if (route.name === "admin_profile") {
+              iconName = focused ? "person-circle" : "person-circle-outline";
+            } else if (route.name === "courses") {
+              iconName = focused ? "library" : "library-outline";
+            } else {
+              iconName = "square";
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
+      >
+        <Tabs.Screen name="admin_home" options={{ title: "Home" }} />
+        <Tabs.Screen name="courses" options={{ title: "Manage Courses" }} />
         <Tabs.Screen
-          name=" admin_profile"
-          options={{ title: "Admin Profile" }}
+          name="admin_profile"
+          options={{ title: "Profile" }}
         />
-        <Tabs.Screen name="admin_home" options={{ title: "Admin Home" }} />
-        <Tabs.Screen name="courses" options={{ title: "Courses" }} />
       </Tabs>
     </AdminUserOnly>
   );
 };
 
-export default _layout;
-
-const styles = StyleSheet.create({
-  rootLayout: {
-    flex: 1,
-    alignContent: "center",
-    alignItems: "center",
-  },
-  myText: {
-    fontWeight: "600",
-    fontSize: 40,
-  },
-});
+export default AdminDashboardLayout;

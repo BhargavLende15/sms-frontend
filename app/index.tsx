@@ -1,22 +1,15 @@
+import React, { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { useUser } from "../hooks/useUser";
 import { useTheme } from "../hooks/useTheme";
-import ThemeToggle from "../components/ThemeToggle";
+import ScreenWrapper from "../components/ScreenWrapper";
+import { FontSizes, Spacing } from "../constants/spacing";
 
 const Index = () => {
   const { user, authChecked } = useUser();
   const router = useRouter();
   const { theme } = useTheme();
-  const containerStyle = useMemo(
-    () => [styles.container, { backgroundColor: theme.background }],
-    [theme]
-  );
-  const textStyle = useMemo(
-    () => [styles.statusText, { color: theme.text }],
-    [theme]
-  );
 
   useEffect(() => {
     if (!authChecked) {
@@ -37,17 +30,18 @@ const Index = () => {
     } else if (userType === "student") {
       route = "/home";
     }
-    router.replace(route);
+    router.replace(route as any);
   }, [authChecked, user]);
 
   return (
-    <View style={containerStyle}>
-      <ActivityIndicator size="large" />
-      <Text style={textStyle}>
-        {authChecked ? "Redirecting..." : "Checking session..."}
-      </Text>
-      <ThemeToggle />
-    </View>
+    <ScreenWrapper style={styles.container}>
+      <View style={styles.content}>
+        <ActivityIndicator size="large" color={theme.primary} />
+        <Text style={[styles.statusText, { color: theme.textSecondary }]}>
+          {authChecked ? "Redirecting..." : "Checking session..."}
+        </Text>
+      </View>
+    </ScreenWrapper>
   );
 };
 
@@ -55,14 +49,15 @@ export default Index;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+  },
+  content: {
+    alignItems: "center",
   },
   statusText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: "#333",
+    marginTop: Spacing.md,
+    fontSize: FontSizes.md,
+    fontWeight: "500",
   },
 });

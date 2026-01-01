@@ -1,24 +1,26 @@
+import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Button,
-  KeyboardAvoidingView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
   View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
 } from "react-native";
-import React, { useMemo, useState } from "react";
 import { Link } from "expo-router";
 import { useUser } from "../../hooks/useUser";
 import { useTheme } from "../../hooks/useTheme";
+import ScreenWrapper from "../../components/ScreenWrapper";
+import CustomInput from "../../components/CustomInput";
+import CustomButton from "../../components/CustomButton";
 import ThemeToggle from "../../components/ThemeToggle";
+import { BorderRadius, FontSizes, Spacing } from "../../constants/spacing";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import dayjs from "dayjs";
-import { Platform } from "react-native";
 
-const index = () => {
+const RegisterScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,69 +32,30 @@ const index = () => {
   const [department, setDepartment] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
   const { register } = useUser();
   const { theme } = useTheme();
-  const containerStyle = useMemo(
-    () => [styles.myview, { backgroundColor: theme.background }],
-    [theme]
-  );
-  const inputStyle = useMemo(
-    () => [styles.input, { color: theme.text, borderColor: theme.text }],
-    [theme]
-  );
-  const pickerStyle = useMemo(
-    () => [
-      styles.pickerWrapper,
-      { borderColor: theme.text, backgroundColor: theme.background },
-    ],
-    [theme]
-  );
-  const pickerTextStyle = useMemo(
-    () => ({ color: theme.text }),
-    [theme]
-  );
-  const linkStyle = useMemo(
-    () => ({ textAlign: "center", color: theme.text }),
-    [theme]
-  );
-  const dobLabel = useMemo(
-    () => dayjs(dateOfBirth).format("YYYY-MM-DD"),
-    [dateOfBirth]
-  );
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!name.trim()) {
-      newErrors.name = "Full name is required";
-    }
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!name.trim()) newErrors.name = "Full name is required";
+    if (!email.trim()) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
       newErrors.email = "Enter a valid email";
-    }
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
-    }
-    if (!mobileNumber.trim()) {
-      newErrors.mobileNumber = "Mobile number is required";
-    } else if (!/^[0-9]{10}$/.test(mobileNumber.trim())) {
+    if (!mobileNumber.trim()) newErrors.mobileNumber = "Mobile number is required";
+    else if (!/^[0-9]{10}$/.test(mobileNumber.trim()))
       newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
-    }
-    if (!department.trim()) {
-      newErrors.department = "Department is required";
-    }
-    if (!dateOfBirth) {
-      newErrors.dateOfBirth = "Date of birth is required";
-    }
+    if (!department.trim()) newErrors.department = "Department is required";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleRegister = async () => {
-    if (!validate()) {
-      return;
-    }
+    if (!validate()) return;
     setLoading(true);
     try {
       await register({
@@ -101,7 +64,7 @@ const index = () => {
         password,
         gender,
         type,
-        dateOfBirth: dayjs(dateOfBirth).format("YYYY-MM-DD"),
+        dateOfBirth: dateOfBirth.toISOString(),
         mobileNumber: mobileNumber.trim(),
         department: department.trim(),
       });
@@ -112,256 +75,212 @@ const index = () => {
     }
   };
 
-  return (
-    <KeyboardAvoidingView style={containerStyle} behavior="padding">
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text style={[styles.title, { color: theme.text }]}>Create Account</Text>
-        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Join us to get started
-        </Text>
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDateOfBirth(selectedDate);
+    }
+  };
 
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Full Name</Text>
-            <TextInput
-              style={[inputStyle, { backgroundColor: theme.input }]}
-              placeholder="Enter your full name"
-              placeholderTextColor={theme.textSecondary}
-              value={name}
-              onChangeText={setName}
-            />
-            {errors.name ? (
-              <Text style={styles.errorText}>{errors.name}</Text>
-            ) : null}
+  const PickerContainer = ({ label, children }: { label: string, children: React.ReactNode }) => (
+    <View style={styles.inputContainer}>
+      <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
+      <View style={[styles.pickerWrapper, { backgroundColor: theme.input, borderColor: theme.border }]}>
+        {children}
+      </View>
+    </View>
+  );
+
+  return (
+    <ScreenWrapper>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.header}>
+             <View style={styles.headerTop}>
+               <ThemeToggle />
+            </View>
+            <Text style={[styles.title, { color: theme.text }]}>Create Account</Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
+              Join us today!
+            </Text>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Email</Text>
-            <TextInput
-              style={[inputStyle, { backgroundColor: theme.input }]}
+          <View style={styles.form}>
+            <CustomInput
+              label="Full Name"
+              placeholder="Enter your full name"
+              value={name}
+              onChangeText={setName}
+              error={errors.name}
+            />
+
+            <CustomInput
+              label="Email"
               placeholder="Enter your email"
-              placeholderTextColor={theme.textSecondary}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              error={errors.email}
             />
-            {errors.email ? (
-              <Text style={styles.errorText}>{errors.email}</Text>
-            ) : null}
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Password</Text>
-            <TextInput
-              secureTextEntry={true}
-              style={[inputStyle, { backgroundColor: theme.input }]}
+            <CustomInput
+              label="Password"
               placeholder="Enter your password"
-              placeholderTextColor={theme.textSecondary}
               value={password}
               onChangeText={setPassword}
+              secureTextEntry
+              error={errors.password}
             />
-            {errors.password ? (
-              <Text style={styles.errorText}>{errors.password}</Text>
-            ) : null}
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Mobile Number</Text>
-            <TextInput
-              style={[inputStyle, { backgroundColor: theme.input }]}
-              placeholder="Enter mobile number"
-              placeholderTextColor={theme.textSecondary}
+            <CustomInput
+              label="Mobile Number"
+              placeholder="Enter your mobile number"
               value={mobileNumber}
               onChangeText={setMobileNumber}
               keyboardType="phone-pad"
+              error={errors.mobileNumber}
             />
-            {errors.mobileNumber ? (
-              <Text style={styles.errorText}>{errors.mobileNumber}</Text>
-            ) : null}
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Department</Text>
-            <TextInput
-              style={[inputStyle, { backgroundColor: theme.input }]}
-              placeholder="Enter department"
-              placeholderTextColor={theme.textSecondary}
+            <CustomInput
+              label="Department"
+              placeholder="Enter your department"
               value={department}
               onChangeText={setDepartment}
+              error={errors.department}
             />
-            {errors.department ? (
-              <Text style={styles.errorText}>{errors.department}</Text>
-            ) : null}
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Gender</Text>
-            <View style={[pickerStyle, { backgroundColor: theme.input, borderColor: theme.border }]}>
+            <PickerContainer label="Gender">
               <Picker
                 selectedValue={gender}
                 onValueChange={(itemValue) => setGender(itemValue)}
+                style={{ color: theme.text }}
                 dropdownIconColor={theme.text}
-                style={pickerTextStyle}
               >
                 <Picker.Item label="Male" value="male" />
                 <Picker.Item label="Female" value="female" />
                 <Picker.Item label="Other" value="other" />
               </Picker>
-            </View>
-          </View>
+            </PickerContainer>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>User Type</Text>
-            <View style={[pickerStyle, { backgroundColor: theme.input, borderColor: theme.border }]}>
+            <PickerContainer label="Role">
               <Picker
                 selectedValue={type}
                 onValueChange={(itemValue) => setType(itemValue)}
+                style={{ color: theme.text }}
                 dropdownIconColor={theme.text}
-                style={pickerTextStyle}
               >
                 <Picker.Item label="Student" value="student" />
                 <Picker.Item label="Teacher" value="teacher" />
                 <Picker.Item label="Admin" value="admin" />
               </Picker>
-            </View>
-          </View>
+            </PickerContainer>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: theme.text }]}>Date of Birth</Text>
-            <Button
-              title={`${dobLabel}`}
-              onPress={() => setShowDatePicker(true)}
-              color={theme.primary}
+            <View style={styles.inputContainer}>
+              <Text style={[styles.label, { color: theme.text }]}>Date of Birth</Text>
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                style={[styles.dateButton, { backgroundColor: theme.input, borderColor: theme.border }]}
+              >
+                <Text style={{ color: theme.text }}>
+                  {dayjs(dateOfBirth).format("YYYY-MM-DD")}
+                </Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={dateOfBirth}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
+            </View>
+
+            <CustomButton
+              title="Sign Up"
+              onPress={handleRegister}
+              loading={loading}
+              style={{ marginTop: Spacing.md }}
             />
-            {errors.dateOfBirth ? (
-              <Text style={styles.errorText}>{errors.dateOfBirth}</Text>
-            ) : null}
-            {showDatePicker && (
-              <DateTimePicker
-                value={dateOfBirth}
-                mode="date"
-                display={Platform.OS === "ios" ? "inline" : "calendar"}
-                onChange={(event, selectedDate) => {
-                  if (Platform.OS !== "ios") {
-                    setShowDatePicker(false);
-                  }
-                  if (selectedDate) {
-                    setDateOfBirth(selectedDate);
-                  }
-                }}
-                maximumDate={new Date()}
-              />
-            )}
-          </View>
 
-          {loading ? (
-            <ActivityIndicator size="large" color={theme.primary} style={styles.loader} />
-          ) : (
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Register"
-                onPress={handleRegister}
-                color={theme.primary}
-              />
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: theme.textSecondary }]}>
+                Already have an account?
+              </Text>
+              <Link href="/login" style={[styles.link, { color: theme.primary }]}>
+                Sign In
+              </Link>
             </View>
-          )}
-
-          <View style={styles.linkContainer}>
-            <Text style={[styles.linkText, { color: theme.textSecondary }]}>
-              Already have an account?{" "}
-            </Text>
-            <Link href="/login">
-              <Text style={[styles.link, { color: theme.primary }]}>Login</Text>
-            </Link>
           </View>
-        </View>
-      </ScrollView>
-      <View style={styles.themeContainer}>
-        <ThemeToggle />
-      </View>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ScreenWrapper>
   );
 };
 
-export default index;
-
 const styles = StyleSheet.create({
-  myview: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 32,
-  },
   scrollContent: {
-    paddingBottom: 32,
+    flexGrow: 1,
+    paddingVertical: Spacing.xl,
+  },
+  header: {
+    marginBottom: Spacing.xl,
+  },
+   headerTop: {
+    alignItems: 'flex-end',
+    marginBottom: Spacing.lg
   },
   title: {
-    fontSize: 32,
-    fontWeight: "700",
-    marginBottom: 8,
-    textAlign: "center",
+    fontSize: FontSizes.xxxl,
+    fontWeight: "bold",
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    marginBottom: 32,
-    textAlign: "center",
+    fontSize: FontSizes.md,
   },
   form: {
     width: "100%",
-    maxWidth: 400,
-    alignSelf: "center",
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: Spacing.md,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  input: {
-    height: 52,
-    borderWidth: 1.5,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    fontSize: 16,
-  },
-  errorText: {
-    color: "#dc2626",
-    fontSize: 12,
-    marginTop: 6,
+    fontSize: FontSizes.sm,
+    marginBottom: Spacing.xs,
+    fontWeight: "500",
   },
   pickerWrapper: {
-    borderWidth: 1.5,
-    borderRadius: 12,
-    height: 52,
+    borderWidth: 1,
+    borderRadius: BorderRadius.lg,
+    overflow: "hidden",
+    justifyContent: "center",
+    height: 50, // Fixed height for consistency
+  },
+  dateButton: {
+    height: 50,
+    borderWidth: 1,
+    borderRadius: BorderRadius.lg,
+    paddingHorizontal: Spacing.md,
     justifyContent: "center",
   },
-  buttonContainer: {
-    marginTop: 8,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  loader: {
-    marginTop: 24,
-  },
-  linkContainer: {
+  footer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 24,
+    marginTop: Spacing.xl,
+    alignItems: "center",
   },
-  linkText: {
-    fontSize: 14,
+  footerText: {
+    fontSize: FontSizes.md,
+    marginRight: Spacing.xs,
   },
   link: {
-    fontSize: 14,
+    fontSize: FontSizes.md,
     fontWeight: "600",
   },
-  themeContainer: {
-    paddingTop: 16,
-  },
 });
+
+export default RegisterScreen;
