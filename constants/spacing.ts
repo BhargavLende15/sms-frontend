@@ -32,3 +32,5 @@ export const FontWeights = {
   bold: "700" as const,
 };
 
+
+
